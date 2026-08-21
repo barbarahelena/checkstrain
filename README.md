@@ -44,36 +44,6 @@ nextflow run main.nf -profile test,docker --outdir results
 | `--osmo_db`          | `null`     | Path to a pre-built `osmo_refdb` release; downloaded automatically if not set.|
 | `--osmo_db_release`  | `latest`   | `osmo_refdb` release to fetch when `--osmo_db` is not set.                    |
 
-## Running on Snellius
-
-Same pattern as this project's other pipelines: a `snellius` profile (SLURM executor,
-partition `genoa`, Singularity) is included in `nextflow.config`. A pre-built Bakta
-database already exists at `/projects/prjs1784/db/bakta_db`, so pass it with
-`--bakta_database` to skip the ~60GB download on every run.
-
-```bash
-#!/bin/bash
-#SBATCH --cpus-per-task=4
-#SBATCH --mem=8G
-#SBATCH --time=24:00:00
-#SBATCH --job-name=checkstrain
-#SBATCH --output=checkstrain_%j.out
-
-eval "$(conda shell.bash hook)"
-conda activate nextflow
-
-nextflow run /projects/prjs1784/pipelines/checkstrain/main.nf \
-    -profile snellius \
-    --input /projects/prjs1784/salt/data/samplesheet.csv \
-    --outdir /projects/prjs1784/salt/results_checkstrain \
-    --bakta_database /projects/prjs1784/db/bakta_db \
-    -resume
-```
-
-`--osmo_db` is left unset here, so `OSMOTOOL_DOWNLOAD_DB` fetches `osmo_refdb` (latest
-release) once per run automatically; pass `--osmo_db /path/to/refdb/<release>` once you
-have a copy on disk to skip that download too, the same way `--bakta_database` does.
-
 ## Output
 
 Per sample, under `outdir/`:
